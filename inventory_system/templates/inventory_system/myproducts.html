@@ -1,0 +1,128 @@
+{% extends "inventory_system/layout.html" %} {% block title %} Login Page
+{%endblock title %} {% block styles %}
+<style>
+  .productbody {
+    overflow-x: hidden;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    height: 85vh;
+  }
+
+  table {
+    width: 80%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #4a69bd;
+    color: white;
+  }
+
+  .button {
+    background-color: #4a69bd;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .button.edit {
+    background-color: #f39c12;
+  }
+
+  .button.delete {
+    background-color: #e74c3c;
+  }
+
+  .button:hover {
+    opacity: 0.8;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+  }
+</style>
+{% endblock styles %} {% block body %}
+
+<div class="productbody">
+  <div class="container">
+    <h2>Product List</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Availability</th>
+          <th>Quantity</th>
+          <th>Date Added</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td>{{ product.name }}</td>
+          <td>{{ product.category }}</td>
+          <td>{{ product.availability|yesno:"Available,Unavailable" }}</td>
+          <td> {{ product.quantity }}</td>
+          <td>{{ product.date }}</td>
+          <td>
+            <a href="{% url "edit_product_view" product.id %}" class="button edit">Edit</a>
+            <a
+              href="{% url 'delete_product' product.id %}"
+              class="button delete"
+              >Delete</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.getElementById("login_btn").onclick = function (e) {
+    e.preventDefault();
+    login();
+  };
+
+  function login() {
+    fetch("/login_user/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({
+        username: login_form.username.value,
+        password: login_form.password.value,
+      }),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data === "Login successful") {
+          window.location.href = "{% url 'index' %}";
+        } else {
+          alert(data);
+        }
+      });
+  }
+</script>
+{% endblock body %}

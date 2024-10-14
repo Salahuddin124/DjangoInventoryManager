@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Reservation</title>
+    <style>
+        .productImage {
+            max-width: 200px; 
+            height: auto; 
+            display: block; /* Center the image horizontally */
+            margin: 0 auto; /* Center the image horizontally */
+            margin-bottom: 20px; /* Add some space below the image */
+        }
+    </style>
+</head>
+<body>
+    <!-- Check if the user is authenticated -->
+    {% if request.user.is_authenticated %}
+    <h1>Product Reservation</h1>
+    
+    <!-- Render the product image -->
+    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="productImage">
+    
+    <!-- Render the product name -->
+    <h2>{{ product.name }}</h2>
+    
+    <!-- Render the product quantity -->
+    <p>Available Quantity: {{ product.quantity }}</p>
+
+    <form id="reservationForm">
+        {% csrf_token %}
+        <input type="number" name="quantity" id="quantity" placeholder="Enter quantity" min="1" max="{{ product.quantity }}">
+        <br>
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date">
+        <br>
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date">
+        <br>
+        <button type="button" onclick="reserveProduct()">Reserve</button>
+    </form>
+    {% else %}
+        <!-- Display a message asking the user to log in -->
+        <p>Please <a href="{% url 'login' %}">login</a> to reserve an item.</p>
+    {% endif %}
+
+    <script>
+    function reserveProduct() {
+    var userId = "{{ request.user.id }}";
+    var username = "{{ request.user.username }}";
+    var quantity = document.getElementById("quantity").value;
+    var productName = "{{ product.name }}";
+    var productId = "{{ product.id }}";
+    var startDate = document.getElementById("start_date").value;
+    var endDate = document.getElementById("end_date").value;
+    var imageUrl = "{{ product.image_url }}"; // URL of the displayed image
+
+    var today = new Date().toISOString().slice(0, 10);
+
+    if (!userId) {
+        alert("Please login to reserve an item.");
+        return false; // Prevent form submission
+    }
+
+    if (startDate <= today) {
+        alert("Start date must be a future date.");
+        return false; // Prevent form submission
+    }
+
+    if (startDate >= endDate) {
+        alert("End date must be after start date.");
+        return false; // Prevent form submission
+    }
+
+    var formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("username", username);
+    formData.append("quantity", quantity);
+    formData.append("productName", productName);
+    formData.append("productId", productId);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+    formData.append("status", "Pending");
+
+    // Fetch the image as a Blob from its URL
+    fetch(imageUrl)
+        .then(response => response.blob())
+        .then(blob => {
+            formData.append("image", blob, "product_image.jpg"); // Append the image blob to FormData
+            
+            // Perform the AJAX request
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/reservationRequests", true);
+            xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken')); // Set CSRF token
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200 || xhr.status === 201) {
+                        alert("Reservation successful!");
+                    } else {
+                        alert("Error: " + xhr.responseText);
+                    }
+                }
+            };
+            xhr.send(formData); // Send form data with the image
+        })
+        .catch(error => console.error('Error fetching the image:', error));
+}
+
+// Function to get the CSRF token from cookies
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+    </script>
+</body>
+</html>

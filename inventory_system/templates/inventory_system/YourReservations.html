@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Reservations</title>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* Custom styles for the card layout */
+        .reservation-card {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5 mb-4">Your Reservations</h1>
+        <!-- Filter buttons -->
+        <div class="mb-3">
+            <button class="btn btn-primary filter-btn" data-status="All">All</button>
+            <button class="btn btn-success filter-btn" data-status="Approved">Approved</button>
+            <button class="btn btn-warning filter-btn" data-status="Pending">Pending</button>
+            <button class="btn btn-danger filter-btn" data-status="Rejected">Rejected</button>
+            <button class="btn btn-secondary filter-btn" data-status="Reclaimed">Reclaimed</button>
+        </div>
+        <div class="row" id="reservation-container">
+            <!-- Reservations will be dynamically loaded here -->
+        </div>
+    </div>
+    <!-- Include Bootstrap JS (optional, only required if you need JavaScript components) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Function to load reservations based on status
+            function loadReservations(status) {
+                var userId = "{{ request.user.id }}"; // Replace with actual logic to retrieve user ID
+                fetch(`/api/reservations/?status=${status}&user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const reservationContainer = document.getElementById('reservation-container');
+                    reservationContainer.innerHTML = ''; // Clear previous reservations
+                    data.forEach(reservation => {
+                        // Create reservation card
+                        const card = `
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card reservation-card">
+                                    <img src="${reservation.product_image_url}" class="card-img-top" alt="${reservation.product_name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${reservation.product_name}</h5>
+                                        <p class="card-text">Quantity: ${reservation.quantity}</p>
+                                        <p class="card-text">Dates: ${reservation.start_date} to ${reservation.end_date}</p>
+                                        <p class="card-text">Status: ${reservation.status}</p>
+                                        ${reservation.status === 'Pending' ? `
+                                        <form action="/remove_reservation/${reservation.id}/" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Remove</button>
+                                        </form>
+                                        ` : reservation.status === 'Approved' ? `
+                                        <form action="/return_reservation/${reservation.id}/" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary">Return Products</button>
+                                        </form>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        reservationContainer.insertAdjacentHTML('beforeend', card);
+                    });
+                });
+            }
+    
+            // Event listener for filter buttons
+            document.querySelectorAll('.filter-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const status = this.getAttribute('data-status');
+                    loadReservations(status);
+                });
+            });
+    
+            loadReservations('All'); // Load all reservations initially
+        });
+    </script>
+</body>
+</html>

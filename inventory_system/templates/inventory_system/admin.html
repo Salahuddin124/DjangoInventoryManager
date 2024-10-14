@@ -1,0 +1,119 @@
+{% extends "inventory_system/layout.html" %}
+
+{% block title %}
+Admin Panel
+{% endblock title %}
+
+{% block styles %}
+    <style>
+       
+        .mainContainer1 {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 85vh;
+            gap: 50px;
+        }
+
+        .mainContainer {
+            width: 60%;
+            height: 200px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            display: flex;
+            justify-content: space-evenly;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+            /* Main container background */
+        }
+
+        .box {
+            width: 300px;
+            padding: 20px;
+            background-color: #FEF2F2;
+            /* Light pink background for boxes */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .iconstyle {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #77B122;
+            /* Icon color */
+        }
+
+        .button {
+            background-color: #77B122;
+            /* Button background color */
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: #000000;
+            /* Darker shade for hover */
+        }
+
+        .underline{
+            position: relative;
+        }
+    </style>
+{% endblock styles %}
+
+{% block body %}
+    <div class="mainContainer1">
+        {% if user.is_authenticated %}
+            {% if user.is_superuser %}
+                <h1>Admin Dashboard</h1>
+                <div class="mainContainer">
+                    <div class="box">
+                        <i class="fas fa-plus-circle icon iconstyle"></i>
+                        <h3>Add Product</h3>
+                        <a href="{% url "new_equipment" %}" class="buttonLink">
+                            <button class="button">Add New</button>
+                        </a>
+                    </div>
+
+                    <div class="box">
+                        <i class="fas fa-list icon iconstyle"></i>
+                        <h3>View Products</h3>
+                        
+                        <a href={% url "list_products" %} class="buttonLink">
+                            <button class="button">View Products</button>
+                        </a>
+                    </div>
+                    
+                    <!-- Button to view reservation requests -->
+                    <div class="box">
+                        <i class="fas fa-tasks icon iconstyle"></i>
+                        <h3>View Reservation Requests</h3>
+                        
+                        <a href={% url "reservation_requests" %} class="buttonLink">
+                            <button class="button">View Requests</button>
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="box">
+                    <h4 style="text-align:center;">You are authenticated as <em style="color:red; display:inline-block">{{ user.username }}</em>, but are not authorized to access this page.
+                        <a style="text-decoration: none; color: #0074D9;" class=".underline" href="{% url "logout" %}">Would you like to login to a different account?</a></h4>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="box">
+                <h4 style="text-align:center;">Please <a style="text-decoration: none; color: #0074D9;" class=".underline" href="{% url "login" %}">login</a> to access this page</h4>
+            </div>
+        {% endif %}
+    </div>
+{% endblock body %}

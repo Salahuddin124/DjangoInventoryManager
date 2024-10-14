@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Requests</title>
+    <style>
+        .card {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        .card img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+
+        .details {
+            flex-grow: 1;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Reservation Requests</h1>
+    {% for reservation in reservations %}
+        <div class="card">
+            <img src="{{ reservation.product.image.url }}" alt="{{ reservation.product_name }}">
+            <div class="details">
+                <h3>{{ reservation.product_name }}</h3>
+                <p>Username: {{ reservation.username }}</p>
+                <p>Quantity: {{ reservation.quantity }}</p>
+                <p>Start Date: {{ reservation.start_date | date:"Y-m-d" }}</p>
+                <p>End Date: {{ reservation.end_date | date:"Y-m-d" }}</p>
+                <p>Status: {{ reservation.status }}</p>
+            </div>
+            <div class="actions">
+                {% if reservation.status == 'Reclaimed' %}
+                    <!-- No buttons if status is Reclaimed -->
+                {% else %}
+                    {% if reservation.status == 'Approved' %}
+                        <form action="{% url 'reclaim_reservation' reservation.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit">Reclaim</button>
+                        </form>
+                    {% else %}
+                        <form action="{% url 'approve_reservation' reservation.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit">Approve</button>
+                        </form>
+                        <form action="{% url 'reject_reservation' reservation.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit">Reject</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</body>
+</html>

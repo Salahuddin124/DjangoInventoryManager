@@ -1,0 +1,126 @@
+/* General Layout */
+pageContainer {
+    padding-top: 64px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+card {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: auto;
+    max-width: 32rem;
+}
+
+lgCard {
+    max-width: 64rem;
+}
+
+cardSection {
+    padding: 2rem;
+    width: 50%;
+}
+
+/* Typography */
+titleLarge {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: black;
+    text-align: center;
+}
+
+titleMedium {
+    font-size: 1.25rem;
+    color: #4a5568;
+    text-align: center;
+}
+
+buttonText {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+inputField {
+    background-color: #edf2f7;
+    color: #4a5568;
+    border: 1px solid #d2d6dc;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+inputFocus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+labelText {
+    color: #4a5568;
+    font-size: 0.875rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+linkText {
+    color: #a0aec0;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* Buttons and Links */
+signInButton {
+    background-color: #38b2ac;
+    border: none;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    width: 100%;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 0.875rem;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+signInButton:hover {
+    background-color: #319795;
+}
+
+signInButton:focus {
+    box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.5);
+}
+
+signInButtonDisabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+}
+
+divider {
+    border-bottom: 1px solid black;
+}
+
+/* Icons */
+iconContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+/* Utility */
+fullWidth {
+    width: 100%;
+}
+
+flexCenter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

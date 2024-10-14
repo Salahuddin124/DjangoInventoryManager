@@ -1,0 +1,186 @@
+{% extends "inventory_system/layout.html" %} {% block title %} Add Product
+{%endblock title %} {% block styles %}
+<style>
+  .addbody {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f4f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  .mainContainer {
+    width: 80%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .formInput {
+    min-width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+
+  .buttoncontainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .formButton {
+    width: 50%;
+    padding: 10px;
+    background-color: #77b122;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .formButton:hover {
+    background-color: #000000;
+  }
+
+  h2 {
+    color: #333;
+  }
+
+  select {
+    color: #6a6b6b;
+    background-color: transparent;
+    border: none;
+    padding: 0 1em 0 0;
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    outline: none;
+    line-height: inherit;
+  }
+
+  select::-ms-expand {
+    display: none;
+  }
+
+  label {
+    font-size: 14px;
+    color: #6a6b6b;
+  }
+
+  .radioDiv {
+    padding: 1px;
+  }
+</style>
+{% endblock styles %} {% block body %}
+<div class="addbody">
+  <div class="mainContainer">
+    <h2>Add New Equipment</h2>
+    <form id="addProductForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <input
+        type="text"
+        class="formInput"
+        name="name"
+        placeholder="Equipment Name"
+        pattern="^[A-Za-z ]+$"
+        required
+      />
+      <div class="formInput">
+        <label class="label" for="category">Category: </label>
+        <select name="category" id="category">
+          {% for category in categories %}
+          <option value="{{category}}">{{category}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <input
+        type="number"
+        class="formInput"
+        name="quantity"
+        placeholder="Quantity"
+        required
+        min="1"
+      />
+
+      <fieldset class="formInput">
+        <div class="radioDiv">
+          <input
+            type="radio"
+            name="availability"
+            value="True"
+            id="available"
+            checked
+          />
+          <label for="available">Available</label>
+        </div>
+        <div class="radioDiv">
+          <input
+            type="radio"
+            name="availability"
+            value="False"
+            id="unavailable"
+          />
+          <label for="unavailable">Unavailable</label>
+        </div>
+      </fieldset>
+      <input type="file" class="formInput" name="image" accept="image/*" />
+      <div class="buttoncontainer">
+        <button type="submit" class="formButton">Add Equipment</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document
+    .getElementById("addProductForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      addProduct();
+    });
+
+  var input = document.getElementById("file");
+  var img_path;
+
+  function get_name() {
+    if (input.files.length > 0) {
+      img_path = input.files[0].name;
+    }
+    return img_path;
+  }
+
+  function addProduct() {
+    const form = document.getElementById("addProductForm");
+    const formData = new FormData(form);
+    console.log(formData);
+
+    fetch("/add_product/", {
+      method: "POST",
+      body: formData,
+      headers: {
+        "X-CSRFToken": csrftoken,
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        alert(data);
+        location.reload();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+</script>
+{% endblock body %}
